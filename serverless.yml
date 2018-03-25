@@ -19,10 +19,14 @@ service: phalanx-backend
 
 custom:
   tableName: 'users-table-${self:provider.stage}'
+  dynamodb:
+      start:
+        migrate: true
 
 plugins:
-  - serverless-offline
-  
+  - serverless-dynamodb-local
+  - serverless-offline #serverless-offline needs to be last in the list
+
 provider:
   name: aws
   runtime: nodejs6.10
@@ -74,7 +78,7 @@ provider:
 functions:
   app:
     handler: index.handler
-    events: 
+    events:
         - http: ANY /
         - http: 'ANY {proxy+}'
 
