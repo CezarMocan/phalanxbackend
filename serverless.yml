@@ -22,6 +22,7 @@ custom:
   dynamodb:
       start:
         migrate: true
+        port: 8070
 
 plugins:
   - serverless-dynamodb-local
