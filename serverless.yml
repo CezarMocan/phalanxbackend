@@ -18,7 +18,7 @@ service: phalanx-backend
 # frameworkVersion: "=X.X.X"
 
 custom:
-  tableName: 'users-table-${self:provider.stage}'
+  tableName: 'canvas-history-table-${self:provider.stage}'
   dynamodb:
       start:
         migrate: true
@@ -43,9 +43,9 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["CanvasHistoryDynamoDBTable", "Arn" ] }
   environment:
-    USERS_TABLE: ${self:custom.tableName}
+    CANVAS_VERSIONS_TABLE: ${self:custom.tableName}
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -119,16 +119,16 @@ functions:
 # you can add CloudFormation resource templates here
 resources:
   Resources:
-    UsersDynamoDBTable:
+    CanvasHistoryDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: userId
-            AttributeType: S
+            AttributeName: version
+            AttributeType: N
         KeySchema:
           -
-            AttributeName: userId
+            AttributeName: version
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

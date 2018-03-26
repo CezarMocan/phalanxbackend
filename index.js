@@ -1,21 +1,22 @@
 const serverless = require('serverless-http');
 const bodyParser = require('body-parser');
 const express = require('express')
+const pify = require('pify')
 const app = express()
 const AWS = require('aws-sdk');
 
-const USERS_TABLE = process.env.USERS_TABLE;
+const CANVAS_VERSIONS_TABLE = process.env.CANVAS_VERSIONS_TABLE;
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 let dynamoDb;
 if (IS_OFFLINE === 'true') {
-  dynamoDb = new AWS.DynamoDB.DocumentClient({
+  dynamoDb = new AWS.DynamoDB({
     region: 'localhost',
-    endpoint: 'http://localhost:8000'
+    endpoint: 'http://localhost:8070'
   })
   console.log(dynamoDb);
 } else {
-  dynamoDb = new AWS.DynamoDB.DocumentClient();
+  dynamoDb = new AWS.DynamoDB();
 };
 
 app.use(bodyParser.json({ strict: false }));
@@ -25,22 +26,23 @@ app.get('/', function (req, res) {
 })
 
 // Get User endpoint
-app.get('/users/:userId', function (req, res) {
+app.get('/version/:versionId', function (req, res) {
+  console.log(req.params)
   const params = {
-    TableName: USERS_TABLE,
+    TableName: CANVAS_VERSIONS_TABLE,
     Key: {
-      userId: req.params.userId,
+      version: { N: req.params.versionId },
     },
+    AttributesToGet: ['version', 'data', 'timestamp']
   }
 
-  dynamoDb.get(params, (error, result) => {
+  dynamoDb.getItem(params, (error, result) => {
     if (error) {
       console.log(error);
       res.status(400).json({ error: 'Could not get user' });
     }
     if (result.Item) {
-      const {userId, name} = result.Item;
-      res.json({ userId, name });
+      res.json({ result });
     } else {
       res.status(404).json({ error: "User not found" });
     }
@@ -48,29 +50,68 @@ app.get('/users/:userId', function (req, res) {
 })
 
 // Create User endpoint
-app.post('/users', function (req, res) {
-  const { userId, name } = req.body;
-  if (typeof userId !== 'string') {
-    res.status(400).json({ error: '"userId" must be a string' });
-  } else if (typeof name !== 'string') {
-    res.status(400).json({ error: '"name" must be a string' });
+app.post('/new', function (req, res) {
+  const { versionData } = req.body;
+  console.log('Data is: ', versionData)
+  if (typeof versionData !== 'string') {
+    res.status(400).json({ error: '"data" must be a string' });
+  }
+  let version
+  const tableParams = {
+    TableName: CANVAS_VERSIONS_TABLE,
   }
 
-  const params = {
-    TableName: USERS_TABLE,
-    Item: {
-      userId: userId,
-      name: name,
-    },
-  };
+  dynamoDb.describeTable(tableParams).promise()
+    .catch(err => {
+      res.status(400).json({ error: err })
+    })
+    .then(data => {
+      versionCount = data.Table.ItemCount
+      console.log('Version count is: ', versionCount)
+      const params = {
+        TableName: CANVAS_VERSIONS_TABLE,
+        Item: {
+          version: { N: versionCount.toString() },
+          data: { S: versionData.toString() },
+          timestamp: { N: new Date().getTime().toString() }
+        }
+      };
+      return dynamoDb.putItem(params).promise()
+    })
+    .catch(err => {
+      res.status(400).json({ error: err })
+    })
+    .then(data => {
+      console.log(data)
+      res.json({ data })
+    })
 
-  dynamoDb.put(params, (error) => {
-    if (error) {
-      console.log(error);
-      res.status(400).json({ error: 'Could not create user' });
-    }
-    res.json({ userId, name });
-  });
+
+  // pify(dynamoDb.describeTable)(tableParams).then((err, data) => {
+  //   if (err) {
+  //     console.log('Error')
+  //     console.log(err)
+  //   } else {
+  //     res.json({ data })
+  //   }
+  // })
+
+  // const params = {
+  //   TableName: CANVAS_VERSIONS_TABLE,
+  //   Item: {
+  //     version: 0,
+  //     data: data,
+  //     timestamp: new Date().getTime()
+  //   },
+  // };
+
+  // dynamoDb.put(params, (error) => {
+  //   if (error) {
+  //     console.log(error);
+  //     res.status(400).json({ error: 'Could not create version' });
+  //   }
+  //   res.json({ data });
+  // });
 })
 
 module.exports.handler = serverless(app);
