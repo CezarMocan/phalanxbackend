@@ -27,7 +27,6 @@ app.get('/', function (req, res) {
 
 // Get User endpoint
 app.get('/version/:versionId', function (req, res) {
-  console.log(req.params)
   const params = {
     TableName: CANVAS_VERSIONS_TABLE,
     Key: {
@@ -40,78 +39,51 @@ app.get('/version/:versionId', function (req, res) {
     if (error) {
       console.log(error);
       res.status(400).json({ error: 'Could not get user' });
+      return
     }
-    if (result.Item) {
-      res.json({ result });
+    if (result.Item && result.Item.data) {
+      res.json({ 
+        versionData: result.Item.data.S,
+        version: result.Item.version.N,
+        creationDate: result.Item.timestamp.N
+      });
     } else {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "Version not found" });
     }
   });
 })
 
 // Create User endpoint
 app.post('/new', function (req, res) {
-  const { versionData } = req.body;
-  console.log('Data is: ', versionData)
-  if (typeof versionData !== 'string') {
-    res.status(400).json({ error: '"data" must be a string' });
-  }
-  let version
+  const versionData = JSON.stringify(req.body.versionData);
+  const timestamp = new Date().getTime()
   const tableParams = {
     TableName: CANVAS_VERSIONS_TABLE,
   }
 
   dynamoDb.describeTable(tableParams).promise()
-    .catch(err => {
-      res.status(400).json({ error: err })
-    })
     .then(data => {
       versionCount = data.Table.ItemCount
-      console.log('Version count is: ', versionCount)
       const params = {
         TableName: CANVAS_VERSIONS_TABLE,
         Item: {
           version: { N: versionCount.toString() },
-          data: { S: versionData.toString() },
-          timestamp: { N: new Date().getTime().toString() }
+          data: { S: versionData },
+          timestamp: { N: timestamp.toString() }
         }
       };
       return dynamoDb.putItem(params).promise()
     })
+    .then(data => {
+      res.json({ 
+        version: versionCount,
+        creationDate: timestamp
+      })
+    })
     .catch(err => {
+      console.log('Error: ', err)
       res.status(400).json({ error: err })
     })
-    .then(data => {
-      console.log(data)
-      res.json({ data })
-    })
-
-
-  // pify(dynamoDb.describeTable)(tableParams).then((err, data) => {
-  //   if (err) {
-  //     console.log('Error')
-  //     console.log(err)
-  //   } else {
-  //     res.json({ data })
-  //   }
-  // })
-
-  // const params = {
-  //   TableName: CANVAS_VERSIONS_TABLE,
-  //   Item: {
-  //     version: 0,
-  //     data: data,
-  //     timestamp: new Date().getTime()
-  //   },
-  // };
-
-  // dynamoDb.put(params, (error) => {
-  //   if (error) {
-  //     console.log(error);
-  //     res.status(400).json({ error: 'Could not create version' });
-  //   }
-  //   res.json({ data });
-  // });
 })
 
 module.exports.handler = serverless(app);
