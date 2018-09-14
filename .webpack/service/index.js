@@ -346,22 +346,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! source-map-support/register */ "source-map-support/register");
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _db__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./db */ "./db.js");
+/* harmony import */ var serverless_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! serverless-http */ "serverless-http");
+/* harmony import */ var serverless_http__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(serverless_http__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! body-parser */ "body-parser");
+/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(body_parser__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! express */ "express");
+/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var pify__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! pify */ "pify");
+/* harmony import */ var pify__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(pify__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _db__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./db */ "./db.js");
 
 
 
 
-var serverless = __webpack_require__(/*! serverless-http */ "serverless-http");
 
-var bodyParser = __webpack_require__(/*! body-parser */ "body-parser");
 
-var express = __webpack_require__(/*! express */ "express");
 
-var pify = __webpack_require__(/*! pify */ "pify");
 
-var app = express();
-
-app.use(bodyParser.json({
+var app = express__WEBPACK_IMPORTED_MODULE_5___default()();
+app.use(body_parser__WEBPACK_IMPORTED_MODULE_4___default.a.json({
   strict: false
 }));
 app.get('/', function (req, res) {
@@ -381,7 +384,7 @@ function () {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_3__["getVersions"])();
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersions"])();
 
           case 3:
             versions = _context.sent;
@@ -424,7 +427,7 @@ function () {
           case 0:
             _context2.prev = 0;
             _context2.next = 3;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_3__["getVersionCount"])();
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersionCount"])();
 
           case 3:
             versionId = _context2.sent;
@@ -441,7 +444,7 @@ function () {
           case 11:
             _context2.prev = 11;
             _context2.next = 14;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_3__["getVersion"])(versionId - 1);
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(versionId - 1);
 
           case 14:
             version = _context2.sent;
@@ -484,7 +487,7 @@ function () {
           case 0:
             _context3.prev = 0;
             _context3.next = 3;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_3__["getVersion"])(req.params.versionId);
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(req.params.versionId);
 
           case 3:
             version = _context3.sent;
@@ -528,7 +531,7 @@ function () {
             timestamp = new Date().getTime();
             _context4.prev = 2;
             _context4.next = 5;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_3__["getVersionCount"])();
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersionCount"])();
 
           case 5:
             versionId = _context4.sent;
@@ -546,7 +549,7 @@ function () {
             console.log('Version ID is: ', versionId);
             _context4.prev = 14;
             _context4.next = 17;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_3__["putVersion"])(versionId, versionData, timestamp);
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["putVersion"])(versionId, versionData, timestamp);
 
           case 17:
             newVersionData = _context4.sent;
@@ -574,7 +577,7 @@ function () {
     return _ref4.apply(this, arguments);
   };
 }());
-var handler = serverless(app);
+var handler = serverless_http__WEBPACK_IMPORTED_MODULE_3___default()(app);
 
 /***/ }),
 

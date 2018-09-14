@@ -1,9 +1,11 @@
-const serverless = require('serverless-http');
-const bodyParser = require('body-parser');
-const express = require('express')
-const pify = require('pify')
-const app = express()
+import serverless from 'serverless-http'
+import bodyParser from 'body-parser'
+import express from 'express'
+import pify from 'pify'
+
 import { getVersions, getVersion, getVersionCount, putVersion } from './db'
+
+const app = express()
 
 app.use(bodyParser.json({ strict: false }));
 
