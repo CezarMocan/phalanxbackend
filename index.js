@@ -3,21 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express')
 const pify = require('pify')
 const app = express()
-const AWS = require('aws-sdk');
-
-const CANVAS_VERSIONS_TABLE = process.env.CANVAS_VERSIONS_TABLE;
-
-const IS_OFFLINE = process.env.IS_OFFLINE;
-let dynamoDb;
-if (IS_OFFLINE === 'true') {
-  dynamoDb = new AWS.DynamoDB({
-    region: 'localhost',
-    endpoint: 'http://localhost:8070'
-  })
-  console.log(dynamoDb);
-} else {
-  dynamoDb = new AWS.DynamoDB();
-};
+import { getVersions, getVersion, getVersionCount, putVersion } from './db'
 
 app.use(bodyParser.json({ strict: false }));
 
@@ -25,65 +11,76 @@ app.get('/', function (req, res) {
   res.send('Hello World!')
 })
 
-// Get User endpoint
-app.get('/version/:versionId', function (req, res) {
-  const params = {
-    TableName: CANVAS_VERSIONS_TABLE,
-    Key: {
-      version: { N: req.params.versionId },
-    },
-    AttributesToGet: ['version', 'data', 'timestamp']
+// Get all site versions
+app.get('/versions', async (req, res) => {
+  let versions
+  try {
+    versions = await getVersions()
+  } catch (e) {
+    res.status(400).json({ e })
+    return
   }
-
-  dynamoDb.getItem(params, (error, result) => {
-    if (error) {
-      console.log(error);
-      res.status(400).json({ error: 'Could not get user' });
-      return
-    }
-    if (result.Item && result.Item.data) {
-      res.json({ 
-        versionData: result.Item.data.S,
-        version: result.Item.version.N,
-        creationDate: result.Item.timestamp.N
-      });
-    } else {
-      res.status(404).json({ error: "Version not found" });
-    }
-  });
+  res.json(versions)
 })
 
-// Create User endpoint
-app.post('/new', function (req, res) {
+app.get('/version/latest', async (req, res) => {
+  let version, versionId
+
+  try {
+    versionId = await getVersionCount()
+  } catch (e) {
+    console.log('Error getting versionId: ', e)
+    res.status(400).json({})
+    return
+  }
+
+  try {
+    version = await getVersion(versionId - 1)
+  } catch (e) {
+    console.log('Failed to get latest version: ', versionId - 1, e)
+    res.status(400).json({})
+    return    
+  }
+  res.json(version)
+})
+
+// Get a certain site version
+app.get('/version/:versionId', async (req, res) => {
+  let version
+
+  try {
+    version = await getVersion(req.params.versionId)
+  } catch (e) {
+    res.status(400).json({})
+    return    
+  }
+  res.json(version)
+})
+
+// Post new site version
+app.post('/new', async (req, res) => {
   const versionData = JSON.stringify(req.body.versionData);
   const timestamp = new Date().getTime()
-  const tableParams = {
-    TableName: CANVAS_VERSIONS_TABLE,
+  let versionId, newVersionData
+
+  try {
+    versionId = await getVersionCount()    
+  } catch (e) {
+    console.log('Error getting versionId: ', e)
+    res.status(400).json({})
+    return
   }
 
-  dynamoDb.describeTable(tableParams).promise()
-    .then(data => {
-      versionCount = data.Table.ItemCount
-      const params = {
-        TableName: CANVAS_VERSIONS_TABLE,
-        Item: {
-          version: { N: versionCount.toString() },
-          data: { S: versionData },
-          timestamp: { N: timestamp.toString() }
-        }
-      };
-      return dynamoDb.putItem(params).promise()
-    })
-    .then(data => {
-      res.json({ 
-        version: versionCount,
-        creationDate: timestamp
-      })
-    })
-    .catch(err => {
-      console.log('Error: ', err)
-      res.status(400).json({ error: err })
-    })
+  console.log('Version ID is: ', versionId)
+
+  try {
+    newVersionData = await putVersion(versionId, versionData, timestamp)
+  } catch (e) {
+    res.status(400).json({})
+    return
+  }
+
+  res.json(newVersionData)
 })
 
-module.exports.handler = serverless(app);
+export const handler = serverless(app);
