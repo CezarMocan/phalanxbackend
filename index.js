@@ -36,6 +36,11 @@ app.get('/version/latest', async (req, res) => {
     return
   }
 
+  if (versionId == 0) {
+    res.json({})
+    return
+  }
+
   try {
     version = await getVersion(versionId - 1)
   } catch (e) {

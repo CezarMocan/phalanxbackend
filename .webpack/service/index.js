@@ -442,31 +442,40 @@ function () {
             return _context2.abrupt("return");
 
           case 11:
-            _context2.prev = 11;
-            _context2.next = 14;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(versionId - 1);
+            if (!(versionId == 0)) {
+              _context2.next = 14;
+              break;
+            }
+
+            res.json({});
+            return _context2.abrupt("return");
 
           case 14:
-            version = _context2.sent;
-            _context2.next = 22;
-            break;
+            _context2.prev = 14;
+            _context2.next = 17;
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(versionId - 1);
 
           case 17:
-            _context2.prev = 17;
-            _context2.t1 = _context2["catch"](11);
+            version = _context2.sent;
+            _context2.next = 25;
+            break;
+
+          case 20:
+            _context2.prev = 20;
+            _context2.t1 = _context2["catch"](14);
             console.log('Failed to get latest version: ', versionId - 1, _context2.t1);
             res.status(400).json({});
             return _context2.abrupt("return");
 
-          case 22:
+          case 25:
             res.json(version);
 
-          case 23:
+          case 26:
           case "end":
             return _context2.stop();
         }
       }
-    }, _callee2, this, [[0, 6], [11, 17]]);
+    }, _callee2, this, [[0, 6], [14, 20]]);
   }));
 
   return function (_x3, _x4) {
