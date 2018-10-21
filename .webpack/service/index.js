@@ -366,10 +366,7 @@ __webpack_require__.r(__webpack_exports__);
 var app = express__WEBPACK_IMPORTED_MODULE_5___default()();
 app.use(body_parser__WEBPACK_IMPORTED_MODULE_4___default.a.json({
   strict: false
-}));
-app.get('/', function (req, res) {
-  res.send('Hello World!');
-}); // Get all site versions
+})); // Get all site versions
 
 app.get('/versions',
 /*#__PURE__*/
@@ -414,13 +411,13 @@ function () {
     return _ref.apply(this, arguments);
   };
 }());
-app.get('/version/latest',
+app.get('/versionCount',
 /*#__PURE__*/
 function () {
   var _ref2 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()(
   /*#__PURE__*/
   _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(req, res) {
-    var version, versionId;
+    var versionCount;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -430,7 +427,7 @@ function () {
             return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersionCount"])();
 
           case 3:
-            versionId = _context2.sent;
+            versionCount = _context2.sent;
             _context2.next = 11;
             break;
 
@@ -442,148 +439,192 @@ function () {
             return _context2.abrupt("return");
 
           case 11:
-            if (!(versionId == 0)) {
-              _context2.next = 14;
-              break;
-            }
+            res.json({
+              versionCount: versionCount
+            });
 
-            res.json({});
-            return _context2.abrupt("return");
-
-          case 14:
-            _context2.prev = 14;
-            _context2.next = 17;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(versionId - 1);
-
-          case 17:
-            version = _context2.sent;
-            _context2.next = 25;
-            break;
-
-          case 20:
-            _context2.prev = 20;
-            _context2.t1 = _context2["catch"](14);
-            console.log('Failed to get latest version: ', versionId - 1, _context2.t1);
-            res.status(400).json({});
-            return _context2.abrupt("return");
-
-          case 25:
-            res.json(version);
-
-          case 26:
+          case 12:
           case "end":
             return _context2.stop();
         }
       }
-    }, _callee2, this, [[0, 6], [14, 20]]);
+    }, _callee2, this, [[0, 6]]);
   }));
 
   return function (_x3, _x4) {
     return _ref2.apply(this, arguments);
   };
-}()); // Get a certain site version
-
-app.get('/version/:versionId',
+}());
+app.get('/version/latest',
 /*#__PURE__*/
 function () {
   var _ref3 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()(
   /*#__PURE__*/
   _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(req, res) {
-    var version;
+    var version, versionId;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.prev = 0;
             _context3.next = 3;
-            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(req.params.versionId);
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersionCount"])();
 
           case 3:
-            version = _context3.sent;
-            _context3.next = 10;
+            versionId = _context3.sent;
+            _context3.next = 11;
             break;
 
           case 6:
             _context3.prev = 6;
             _context3.t0 = _context3["catch"](0);
+            console.log('Error getting versionId: ', _context3.t0);
             res.status(400).json({});
             return _context3.abrupt("return");
+
+          case 11:
+            if (!(versionId == 0)) {
+              _context3.next = 14;
+              break;
+            }
+
+            res.json({});
+            return _context3.abrupt("return");
+
+          case 14:
+            _context3.prev = 14;
+            _context3.next = 17;
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(versionId - 1);
+
+          case 17:
+            version = _context3.sent;
+            _context3.next = 25;
+            break;
+
+          case 20:
+            _context3.prev = 20;
+            _context3.t1 = _context3["catch"](14);
+            console.log('Failed to get latest version: ', versionId - 1, _context3.t1);
+            res.status(400).json({});
+            return _context3.abrupt("return");
+
+          case 25:
+            res.json(version);
+
+          case 26:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3, this, [[0, 6], [14, 20]]);
+  }));
+
+  return function (_x5, _x6) {
+    return _ref3.apply(this, arguments);
+  };
+}()); // Get a certain site version
+
+app.get('/version/:versionId',
+/*#__PURE__*/
+function () {
+  var _ref4 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()(
+  /*#__PURE__*/
+  _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(req, res) {
+    var version;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.prev = 0;
+            _context4.next = 3;
+            return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersion"])(req.params.versionId);
+
+          case 3:
+            version = _context4.sent;
+            _context4.next = 10;
+            break;
+
+          case 6:
+            _context4.prev = 6;
+            _context4.t0 = _context4["catch"](0);
+            res.status(400).json({});
+            return _context4.abrupt("return");
 
           case 10:
             res.json(version);
 
           case 11:
           case "end":
-            return _context3.stop();
+            return _context4.stop();
         }
       }
-    }, _callee3, this, [[0, 6]]);
+    }, _callee4, this, [[0, 6]]);
   }));
 
-  return function (_x5, _x6) {
-    return _ref3.apply(this, arguments);
+  return function (_x7, _x8) {
+    return _ref4.apply(this, arguments);
   };
 }()); // Post new site version
 
 app.post('/new',
 /*#__PURE__*/
 function () {
-  var _ref4 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()(
+  var _ref5 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()(
   /*#__PURE__*/
-  _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(req, res) {
+  _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(req, res) {
     var versionData, timestamp, versionId, newVersionData;
-    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context4.prev = _context4.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
             versionData = JSON.stringify(req.body.versionData);
             timestamp = new Date().getTime();
-            _context4.prev = 2;
-            _context4.next = 5;
+            _context5.prev = 2;
+            _context5.next = 5;
             return Object(_db__WEBPACK_IMPORTED_MODULE_7__["getVersionCount"])();
 
           case 5:
-            versionId = _context4.sent;
-            _context4.next = 13;
+            versionId = _context5.sent;
+            _context5.next = 13;
             break;
 
           case 8:
-            _context4.prev = 8;
-            _context4.t0 = _context4["catch"](2);
-            console.log('Error getting versionId: ', _context4.t0);
+            _context5.prev = 8;
+            _context5.t0 = _context5["catch"](2);
+            console.log('Error getting versionId: ', _context5.t0);
             res.status(400).json({});
-            return _context4.abrupt("return");
+            return _context5.abrupt("return");
 
           case 13:
             console.log('Version ID is: ', versionId);
-            _context4.prev = 14;
-            _context4.next = 17;
+            _context5.prev = 14;
+            _context5.next = 17;
             return Object(_db__WEBPACK_IMPORTED_MODULE_7__["putVersion"])(versionId, versionData, timestamp);
 
           case 17:
-            newVersionData = _context4.sent;
-            _context4.next = 24;
+            newVersionData = _context5.sent;
+            _context5.next = 24;
             break;
 
           case 20:
-            _context4.prev = 20;
-            _context4.t1 = _context4["catch"](14);
+            _context5.prev = 20;
+            _context5.t1 = _context5["catch"](14);
             res.status(400).json({});
-            return _context4.abrupt("return");
+            return _context5.abrupt("return");
 
           case 24:
             res.json(newVersionData);
 
           case 25:
           case "end":
-            return _context4.stop();
+            return _context5.stop();
         }
       }
-    }, _callee4, this, [[2, 8], [14, 20]]);
+    }, _callee5, this, [[2, 8], [14, 20]]);
   }));
 
-  return function (_x7, _x8) {
-    return _ref4.apply(this, arguments);
+  return function (_x9, _x10) {
+    return _ref5.apply(this, arguments);
   };
 }());
 var handler = serverless_http__WEBPACK_IMPORTED_MODULE_3___default()(app);

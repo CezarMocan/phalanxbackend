@@ -9,10 +9,6 @@ const app = express()
 
 app.use(bodyParser.json({ strict: false }));
 
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
-
 // Get all site versions
 app.get('/versions', async (req, res) => {
   let versions
@@ -23,6 +19,20 @@ app.get('/versions', async (req, res) => {
     return
   }
   res.json(versions)
+})
+
+app.get('/versionCount', async (req, res) => {
+  let versionCount
+
+  try {
+    versionCount = await getVersionCount()
+  } catch (e) {
+    console.log('Error getting versionId: ', e)
+    res.status(400).json({})
+    return
+  }
+
+  res.json({ versionCount: versionCount })
 })
 
 app.get('/version/latest', async (req, res) => {
