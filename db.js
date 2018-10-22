@@ -48,13 +48,13 @@ export const getVersionCount = async () => {
   let data
 
   try {
-    data = await dynamoDb.describeTable(params).promise()
+    data = await dynamoDb.scan(params).promise()
+    //await dynamoDb.describeTable(params).promise()
   } catch (e) {
-    throw new Error('Count not get version count')
-    return
+    throw new Error(JSON.stringify(data) + " --- " + JSON.stringify(e))
   }
 
-  return data.Table.ItemCount
+  return data.Count
 }
 
 export const getVersion = async (versionId) => {

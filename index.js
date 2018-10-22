@@ -33,7 +33,7 @@ app.get('/versionCount', async (req, res) => {
     versionCount = await getVersionCount()
   } catch (e) {
     console.log('Error getting versionId: ', e)
-    res.status(400).json({})
+    res.status(400).json({error: JSON.stringify(e)})
     return
   }
 
@@ -89,7 +89,7 @@ app.post('/new', async (req, res) => {
     versionId = await getVersionCount()    
   } catch (e) {
     console.log('Error getting versionId: ', e)
-    res.status(400).json({})
+    res.status(400).json({e})
     return
   }
 
@@ -98,7 +98,7 @@ app.post('/new', async (req, res) => {
   try {
     newVersionData = await putVersion(versionId, versionData, timestamp)
   } catch (e) {
-    res.status(400).json({})
+    res.status(400).json({e})
     return
   }
 

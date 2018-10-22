@@ -17,7 +17,8 @@ export const get_Version = (versionId) => {
 
 export const get_VersionCount = () => {
   return {
-    TableName: CANVAS_VERSIONS_TABLE
+    TableName: CANVAS_VERSIONS_TABLE,
+    AttributesToGet: ['version']
   }
 }
 
