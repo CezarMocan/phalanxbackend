@@ -57,11 +57,11 @@ app.get('/version/latest', async (req, res) => {
   }
 
   try {
-    version = await getVersion(versionId - 1)
+    version = await getVersion(versionId)
   } catch (e) {
-    console.log('Failed to get latest version: ', versionId - 1, e)
+    console.log('Failed to get latest version: ', versionId, e)
     res.status(400).json({})
-    return    
+    return
   }
   res.json(version)
 })
@@ -74,7 +74,7 @@ app.get('/version/:versionId', async (req, res) => {
     version = await getVersion(req.params.versionId)
   } catch (e) {
     res.status(400).json({})
-    return    
+    return
   }
   res.json(version)
 })
@@ -86,17 +86,17 @@ app.post('/new', async (req, res) => {
   let versionId, newVersionData
 
   try {
-    versionId = await getVersionCount()    
+    versionId = await getVersionCount()
   } catch (e) {
     console.log('Error getting versionId: ', e)
     res.status(400).json({e})
     return
   }
 
-  console.log('Version ID is: ', versionId)
+  console.log('Version ID is: ', versionId + 1)
 
   try {
-    newVersionData = await putVersion(versionId, versionData, timestamp)
+    newVersionData = await putVersion(versionId + 1, versionData, timestamp)
   } catch (e) {
     res.status(400).json({e})
     return

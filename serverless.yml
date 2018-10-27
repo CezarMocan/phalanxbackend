@@ -18,7 +18,8 @@ service: phalanx-backend
 # frameworkVersion: "=X.X.X"
 
 custom:
-  tableName: 'canvas-history-table-${self:provider.stage}'
+  versionsTableName: 'canvas-history-table-${self:provider.stage}'
+  versionCountTableName: 'canvas-version-count-table-${self:provider.stage}'
   dynamodb:
       start:
         migrate: true
@@ -50,8 +51,10 @@ provider:
         - dynamodb:DescribeTable
       Resource:
         - { "Fn::GetAtt": ["CanvasHistoryDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["CanvasVersionCountDynamoDBTable", "Arn" ] }
   environment:
-    CANVAS_VERSIONS_TABLE: ${self:custom.tableName}
+    CANVAS_VERSIONS_TABLE: ${self:custom.versionsTableName}
+    CANVAS_VERSION_COUNT_TABLE: ${self:custom.versionCountTableName}
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -137,9 +140,25 @@ resources:
             AttributeName: version
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 5
+        TableName: ${self:custom.versionsTableName}
+    CanvasVersionCountDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 20
           WriteCapacityUnits: 1
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.versionCountTableName}
+
 #resources:
 #  Resources:
 #    NewResource:

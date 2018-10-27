@@ -1,4 +1,4 @@
-import { get_AllVersions, get_Version, get_VersionCount, put_Version, CANVAS_VERSIONS_TABLE } from './queries'
+import { get_AllVersions, get_Version, get_VersionCount, put_Version, put_VersionCount } from './queries'
 
 const AWS = require('aws-sdk');
 // Initialize DB
@@ -48,13 +48,14 @@ export const getVersionCount = async () => {
   let data
 
   try {
-    data = await dynamoDb.scan(params).promise()
-    //await dynamoDb.describeTable(params).promise()
+    data = await dynamoDb.getItem(params).promise()
   } catch (e) {
-    throw new Error(JSON.stringify(data) + " --- " + JSON.stringify(e))
+    return 0
   }
 
-  return data.Count
+  console.log('getVersionCount: ', data)
+  if (!data.Item) return 0
+  return parseInt(data.Item.version.N)
 }
 
 export const getVersion = async (versionId) => {
@@ -88,9 +89,20 @@ export const putVersion = async (versionId, versionData, timestamp) => {
   try {
     result = await dynamoDb.putItem(params).promise()
   } catch (e) {
-    console.log('Caught error in putVersion: ', e)
+    console.error('Caught error in putVersion: ', e)
     throw new Error('Could not put version')
     return
+  }
+
+  console.log('Putting version: ', versionId)
+
+  const countParams = put_VersionCount(versionId)
+  try {
+    result = await dynamoDb.putItem(countParams).promise()
+    console.log(result)
+  } catch (e) {
+    console.error('Caught error in putVersionCount: ', e)
+    throw new Error('Could not put version count')
   }
 
   return {
